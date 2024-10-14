@@ -1,0 +1,82 @@
+# Package ######################################################################
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multigrid"
+description = "Fast multi-agent gridworld reinforcement learning environments."
+readme = "README.md"
+requires-python = ">= 3.9"
+authors = [{ name = "Ini Oguntola", email = "ini@ini.io" }]
+license = { text = "Apache License" }
+keywords = ["Memory, Environment, Agent, Multi-Agent, RL, Gymnasium, Cooperative, Competitive"]
+classifiers = [
+    "Development Status :: 4 - Beta",  # change to `5 - Production/Stable` when ready
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    'Intended Audience :: Science/Research',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+]
+dependencies = [
+    "aenum>=1.3.0",
+    "numba>=0.53.0",
+    "numpy>=1.18.0",
+    "gymnasium>=0.26",
+    "pygame>=2.2.0",
+]
+dynamic = ["version"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["multigrid*"]
+
+# Linters and Test tools #######################################################
+
+[tool.black]
+safe = true
+
+[tool.isort]
+atomic = true
+profile = "black"
+append_only = true
+src_paths = ["multigrid"]
+add_imports = [ "from __future__ import annotations" ]
+
+[tool.pyright]
+include = [
+    "multigrid/**",
+]
+
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+]
+
+strict = []
+
+typeCheckingMode = "basic"
+pythonVersion = "3.9"
+typeshedPath = "typeshed"
+enableTypeIgnoreComments = true
+
+# This is required as the CI pre-commit does not download the module (i.e. numpy)
+#   Therefore, we have to ignore missing imports
+reportMissingImports = "none"
+
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+reportUnknownVariableType = "none"
+reportUnknownArgumentType = "none"
+reportPrivateUsage = "warning"
+reportUntypedFunctionDecorator = "none"
+reportMissingTypeStubs = false
+reportUnboundVariable = "warning"
+reportGeneralTypeIssues ="none"
+reportPrivateImportUsage = "none"
