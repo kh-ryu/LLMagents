@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from math import ceil
-from multigrid import MultiGridEnv
+from multigrid.base import MultiGridEnv
 from multigrid.core.actions import Action
 from multigrid.core.constants import Color, Direction
 from multigrid.core.mission import MissionSpace

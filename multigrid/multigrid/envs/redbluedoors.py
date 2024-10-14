@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from multigrid import MultiGridEnv
+from multigrid.base import MultiGridEnv
 from multigrid.core import Action, Grid, MissionSpace
 from multigrid.core.constants import Color
 from multigrid.core.world_object import Door
