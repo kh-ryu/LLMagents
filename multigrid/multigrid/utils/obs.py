@@ -24,6 +24,7 @@ AGENT_CARRYING_IDX = AgentState.CARRYING
 AGENT_ENCODING_IDX = AgentState.ENCODING
 
 TYPE = WorldObj.TYPE
+COLOR = WorldObj.COLOR
 STATE = WorldObj.STATE
 
 WALL = int(Type.wall)
@@ -62,8 +63,8 @@ def see_behind(world_obj: ndarray[np.int_]) -> bool:
 
     return True
 
-@nb.njit(cache=True)
-def gen_obs_grid_encoding(
+
+def  gen_obs_grid_encoding(
     grid_state: ndarray[np.int_],
     agent_state: ndarray[np.int_],
     agent_view_size: int,
@@ -98,8 +99,12 @@ def gen_obs_grid_encoding(
                 for j in range(agent_view_size):
                     if not vis_mask[agent, i, j]:
                         obs_grid[agent, i, j] = UNSEEN_ENCODING
+    
 
-    return obs_grid
+    obs_text = obs_to_text(obs_grid, agent_state)
+
+    return obs_grid, obs_text
+
 
 @nb.njit(cache=True)
 def gen_obs_grid_vis_mask(
@@ -151,7 +156,7 @@ def gen_obs_grid(
     """
     num_agents = len(agent_state)
     obs_width, obs_height = agent_view_size, agent_view_size
-
+    
     # Process agent states
     agent_grid_encoding = agent_state[..., AGENT_ENCODING_IDX]
     agent_dir = agent_state[..., AGENT_DIR_IDX]
@@ -194,13 +199,12 @@ def gen_obs_grid(
                     i_rot, j_rot = obs_width - i - 1, obs_height - j - 1
                 elif num_left_rotations[agent] == 3:
                     i_rot, j_rot = obs_height - j - 1, i
-
                 # Set observation grid
                 if 0 <= x < grid_encoding.shape[0] and 0 <= y < grid_encoding.shape[1]:
                     obs_grid[agent, i_rot, j_rot] = grid_encoding[x, y]
                 else:
                     obs_grid[agent, i_rot, j_rot] = WALL_ENCODING
-
+                
     # Make it so each agent sees what it's carrying
     # We do this by placing the carried object at the agent position
     # in each agent's partially observable view
@@ -208,6 +212,85 @@ def gen_obs_grid(
 
     return obs_grid
 
+def obs_to_text(
+    obs_grid: ndarray[np.int_],
+    agent_states
+) -> list[str]:
+    """
+    Convert the observation grid to a human-readable text representation.
+
+    Parameters
+    ----------
+    obs_grid : ndarray[int] of shape (num_agents, width, height, encode_dim)
+        Observed sub-grid for each agent.
+    agent_states : list[AgentState]
+        List of agent states, including attributes like color, direction, and position.
+
+    Returns
+    -------
+    descriptions : list[str]
+        A list of descriptions for each agent's observation.
+    """
+    # Extract dimensions
+    num_agents, obs_width, obs_height, _ = obs_grid.shape
+    descriptions = []
+    direction = {RIGHT: "Right", LEFT: "Left", UP: "Up", DOWN: "Down"}
+    
+    # Process each agent
+    for agent in range(num_agents):
+        agent_obs = [f"Agent {agent} Observations:"]
+        
+        for i in range(obs_width):
+            row_description = []
+            
+            for j in range(obs_height):
+                # Extract cell information
+                cell = obs_grid[agent, i, j]
+                cell_type_index = cell[TYPE]
+                cell_color_index = cell[COLOR]
+                cell_state_index = cell[STATE]
+
+                # Map indices to human-readable types
+                cell_type = Type.from_index(cell_type_index).name
+                cell_color = (
+                    Color.from_index(cell_color_index).name if cell_type != "unseen" else ""
+                )
+                
+                if [i, j] == [obs_width // 2, obs_height - 1]:  # Agent's position
+                    cell_state = State.from_index(cell_state_index).name
+            
+                    row_description.append(
+                        f"You (Carrying {cell_type}, Color: {cell_color}, State: {cell_state}), "
+                        f"Your Color: {agent_states[agent].color.name}, "
+                        
+                        f"Your Direction: {agent_states[agent].dir.name}"
+                    )
+                elif cell_type == "agent":  # Another agent in the grid
+                    agent_dir = cell_state_index
+                    agent_dir = Direction(agent_dir).name
+                    row_description.append(
+                        f"Other Agent (Color: {agent_states[agent].color.name}, Direction: {agent_dir})"
+                    )
+                elif cell_type == "empty":  # Empty cell
+                    row_description.append("Empty")
+                elif cell_type == "unseen":  
+                    row_description.append("Unseen")
+                else:  # Generic object
+                    cell_state = State.from_index(cell_state_index).name
+                    row_description.append(
+                        f"{cell_type} (Color: {cell_color}, State: {cell_state})"
+                    )
+            
+            # Add row description
+            agent_obs.append(" | ".join(row_description))
+        
+        # Append full observation for this agent
+        descriptions.append("\n".join(agent_obs))
+    
+    return descriptions
+
+
+    
 @nb.njit(cache=True)
 def get_see_behind_mask(grid_array: ndarray[np.int_]) -> ndarray[np.int_]:
     """

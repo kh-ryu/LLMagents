@@ -358,7 +358,8 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                 * 'mission': textual mission string (instructions for the agent)
         """
         direction = self.agent_states.dir
-        image = gen_obs_grid_encoding(
+
+        image, text = gen_obs_grid_encoding(
             self.grid.state,
             self.agent_states,
             self.agents[0].view_size,
@@ -370,6 +371,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
             observations[i] = {
                 'image': image[i],
                 'direction': direction[i],
+                'text': text[i],
                 'mission': self.agents[i].mission,
             }
 

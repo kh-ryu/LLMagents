@@ -56,7 +56,7 @@ class Agent:
         self,
         index: int,
         mission_space: MissionSpace = MissionSpace.from_string('maximize reward'),
-        view_size: int = 7,
+        view_size: int = 3,
         see_through_walls: bool = False):
         """
         Parameters
