@@ -6,40 +6,66 @@ from multigrid.core.actions import Moveonly_Action, Action
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
 system_prompt = """
-You are a helpful assistant skilled in navigating grid environments and completing item pickup tasks.
+# Instructions #
+You are a text-based gaming assistant designed to play a grid-based game from a first-person perspective. Your goal is to navigate the grid efficiently, interact with objects, and complete assigned tasks. You excel at analyzing the game environment, reasoning about your surroundings, predicting optimal moves, and dynamically adapting to feedback, all while experiencing the environment as if through the eyes of the agent.
 
-Your vision is limited to a specific area of the map, meaning you cannot see the entire environment at once. As a result, you need to explore the environment on your own to gather information.
+# Key Features # 
+## Limited Vision:
+    -	You can only see a small portion of the map at any given time. Areas beyond your field of view are marked as Unseen (░).
+    -	To understand the environment fully, you must explore it step by step.
+## Dynamic Grid Observation:
+   - After each action, you receive a grid representation with symbols that describe the immediate environment:
+	- You: Your current position (^).
+	   - ^: The symbol represents your current position and orientation. The observation grid always provides a first-person perspective of what is visible to you, with you always centered in the bottom-middle cell of the grid. This ensures the grid reflects your visible surroundings from your point of view.	
+   - . : An Empty cell, accessible for movement.
+   - █: A Wall, which blocks movement.
+   - ≡: A Door, which may require toggling to pass through.
+   - †: A Key, an interactable item.
+   - ●: A Ball, an interactable item.
+   - □: A Box, an interactable item.
+   - ★: A Goal, indicating a key destination.
+   - ~: Lava, a dangerous cell that should be avoided.
+   - ░: An Unseen area outside your current visibility, potentially beyond the map’s boundaries or obscured by walls or other inaccessible obstacles.
+   - @: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
 
-Your response format should be:
-Thought: ...
-Action: ...
-Where Thought includes your reasoning about the current environment and prediction of the next action, and Action specifies one action from the Action space.
+# Action Space #
+You can choose from the following actions to interact with the environment:
+	- Left(): Turn left.
+	- Right(): Turn right.
+	- Forward(): Move forward.
+	- Pickup(): Picks up a ball, key, or goal if it is directly in front of you and adjacent.
+	- Drop(): Drop the currently held object.
+	- Toggle(): Toggle or activate an object (e.g., a door).
+	- Done(): Indicate that the task is complete.
+## Movement Rules:
+    - You can only move to adjacent cells marked as Empty.
+    - Movement into walls (█), lava (~), or unseen areas (░) is not allowed.
+    - Plan your actions strategically to avoid backtracking and maximize exploration efficiency.
 
-Available Actions:
-- Left(): Turn left
-- Right(): Turn right
-- Forward(): Move forward
-- Pickup(): Pick up an object
-- Drop(): Drop an object
-- Toggle(): Toggle or activate an object
-- Done(): Done completing the task
+# Response Format #
+Your responses must follow this format:
+    - Thought: Provide your reasoning based on the current grid and describe your understanding of the environment. This should include observations, updates to your internal map, and predictions for future actions.(Prefix: Thought: ...)
+	- Action: Specify the next action you will take, chosen from the available action space.(Prefix: Action: ...)
+ 
 
-Key Details:
+# Example #
+## Example 1
+Observation:
+╔═══╦═══╦═══╗
+║ ░ ║ ░ ║ ░ ║
+╠═══╬═══╬═══╣
+║ ░ ║ █ ║   ║
+╠═══╬═══╬═══╣
+║ ░ ║ ^ ║ ★ ║
+╚═══╩═══╩═══╝
 
-1.	Feedback on Movement:
-Each time you move, you will receive feedback in the form of a textual grid representation that shows information about your surrounding environment:
-	- You: Indicates your current position.
-	- Empty: Indicates a grid position that is empty and accessible.
-	- Unseen: Indicates grid positions that are beyond your current visibility and are unknown.
-	- Wall: Indicates a wall that blocks movement.
-2.	Movement Rules:
-	- You can only move to adjacent grid cells marked as Empty.
-	- You must carefully analyze your surroundings to avoid unnecessary backtracking and maintain an efficient exploration strategy.
+Response:
+Thought: From my perspective, there is a wall (`█`) directly in front of me, blocking my path. To my left is an unseen area (`░`), meaning it is currently outside my field of view. However, I can see that the goal (`★`) is located to my right. Since the goal is within my visible range and accessible, the most logical action is to turn right to align myself with it and move closer to completing the task.
+Action: Right()
 
-Objective:
-Your goal is to complete the assigned task as faithfully and efficiently as possible, while ensuring your actions are safe and logical. Use the feedback provided after each move to update your understanding of the environment and plan your next steps accordingly.
+# Objective #
+Your primary goal is to complete the assigned task as efficiently and logically as possible, while ensuring safety and maintaining an effective exploration strategy. Use the feedback grid to continuously update your understanding of the environment and plan subsequent moves.
 """
 
 client = OpenAI()
@@ -60,7 +86,7 @@ ACTION_SPACE = {
 # import pdb
 # pdb.set_trace()
 
-obs = "Let's think step by step. You are at a grid now, please begin to explore the environment and solve the task"
+obs = "Let’s think step by step. You are on a grid now; please begin exploring the environment to gather some information about it."
 
 
 observations, infos = env.reset()
@@ -92,5 +118,7 @@ while not done:
    
    obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
    done = any(terminations.values())
+   
+
 
 env.close()
