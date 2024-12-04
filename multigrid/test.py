@@ -39,7 +39,7 @@ Each time you move, you will receive feedback in the form of a textual grid repr
 	- You must carefully analyze your surroundings to avoid unnecessary backtracking and maintain an efficient exploration strategy.
 
 Objective:
-Your goal is to complete the assigned task as faithfully and efficiently as possible, while ensuring your actions are safe and logical. Use the feedback provided after each move to update your understanding of the environment and plan your next steps accordingly..
+Your goal is to complete the assigned task as faithfully and efficiently as possible, while ensuring your actions are safe and logical. Use the feedback provided after each move to update your understanding of the environment and plan your next steps accordingly.
 """
 
 client = OpenAI()
@@ -57,8 +57,6 @@ ACTION_SPACE = {
     "done()": Action.done
 }
 
-
-
 # import pdb
 # pdb.set_trace()
 
@@ -68,7 +66,7 @@ obs = "Let's think step by step. You are at a grid now, please begin to explore 
 observations, infos = env.reset()
 done = False
 while not done:
-
+   
    messages.append({"role": "user", "content": obs})
    print(f"Observation: {obs}")
    response = client.chat.completions.create(
@@ -84,15 +82,14 @@ while not done:
    match = re.search(pattern, response)
    if match:
       action = match.group(1)
-      action = [ACTION_SPACE[action.lower().strip()]]
+      action = {0: ACTION_SPACE[action.lower().strip()]}
    else:
       obs = "Failed to parse your action."
       continue
-
+   
 
    observations, rewards, terminations, truncations, infos = env.step(action)
-   env.render()
-
+   
    obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
    done = any(terminations.values())
 

@@ -236,6 +236,23 @@ def obs_to_text(
     descriptions = []
     direction = {RIGHT: "Right", LEFT: "Left", UP: "Up", DOWN: "Down"}
     
+    type_symbols = {
+        "unseen": "░",
+        "empty": " ",
+        "wall": "█", 
+        "floor": ".", 
+        "door": "║",
+        "key": "†",
+        "ball": "●", 
+        "box": "□", 
+        "goal": "★",
+        "lava": "~", 
+        "agent": "@", 
+    }
+    
+    
+    direction = {RIGHT: ">", LEFT: "<", UP: "^", DOWN: "v"}
+    
     # Process each agent
     for agent in range(num_agents):
         agent_obs = [f"Agent {agent} Observations:"]
