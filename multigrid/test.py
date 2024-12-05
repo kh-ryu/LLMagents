@@ -45,7 +45,7 @@ You can choose from the following actions to interact with the environment:
 
 # Response Format #
 Your responses must follow this format:
-    - Thought: Provide your reasoning based on the current grid and describe your understanding of the environment. This should include observations, updates to your internal map, and predictions for future actions.(Prefix: Thought: ...)
+   - Thought: Provide your reasoning based on the current grid and describe your understanding of the environment. This should include observations, updates to your internal map, and predictions for future actions.(Prefix: Thought: ...)
 	- Action: Specify the next action you will take, chosen from the available action space.(Prefix: Action: ...)
  
 

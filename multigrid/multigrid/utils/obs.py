@@ -400,6 +400,11 @@ def obs_to_text(
             for j, content in enumerate(row):
                 column_widths[j] = max(column_widths[j], len(content))
 
+        
+        
+        
+        
+        '''
         # Generate table with updated dimensions
         horizontal_line = "╔" + "╦".join("═" * (w + 2) for w in column_widths) + "╗"
         middle_line = "╠" + "╬".join("═" * (w + 2) for w in column_widths) + "╣"
@@ -418,6 +423,17 @@ def obs_to_text(
                 agent_obs.append(middle_line)
 
         agent_obs.append(bottom_line)
+        descriptions.append("\n".join(agent_obs))
+        '''
+        # Generate the character-based list representation of the matrix
+        agent_obs = ["Observation:"]
+
+        # Convert cell_contents into a nested string representation
+        matrix_str = "[ " + ",\n  ".join([str(row) for row in cell_contents]) + " ]"
+
+        # Add the formatted matrix string to agent_obs
+        agent_obs.append(matrix_str)
+
         descriptions.append("\n".join(agent_obs))
 
     return descriptions
