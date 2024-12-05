@@ -145,8 +145,11 @@ class BlockedUnlockPickupEnv(RoomGrid):
         """
         super()._gen_grid(width, height)
 
-        # Add a box to the room on the right
-        self.obj, _ = self.add_object(1, 0, kind=Type.box)
+        # # Add a box to the room on the right
+        # self.obj, _ = self.add_object(1, 0, kind=Type.box)
+
+        # Add a goal to the room on the right
+        self.obj, _ = self.add_object(1, 0, kind=Type.goal)
 
         # Make sure the two rooms are directly connected by a locked door
         door, pos = self.add_door(0, 0, Direction.right, locked=True)
