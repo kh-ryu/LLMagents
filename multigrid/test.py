@@ -8,9 +8,10 @@ from prompt.utils import file_to_string
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-prompt_folder = "kanghyun_prompt"
+system_prompt_folder = "maulik_prompt"
+user_prompt_folder = "kanghyun_prompt"
 
-system_prompt = file_to_string(f"./prompt/{prompt_folder}/system_prompt.txt")
+system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/system_prompt.txt")
 
 
 client = OpenAI()
@@ -31,7 +32,7 @@ ACTION_SPACE = {
 # import pdb
 # pdb.set_trace()
 
-obs = file_to_string(f"./prompt/{prompt_folder}/user_prompt.txt")
+obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt.txt")
 
 observations, infos = env.reset()
 done = False
