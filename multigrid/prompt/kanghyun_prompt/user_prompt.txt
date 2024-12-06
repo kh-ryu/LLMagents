@@ -1,0 +1,8 @@
+You are on a grid now; please begin exploring the environment to gather some information about it.
+You should first pick up the ball blocking the door and move to some other location.
+Then, you should pick up the key and unlock the door.
+Finally, you should move to the goal location to complete the task.
+Remember, you can only move to adjacent cells marked as Empty.
+Movement into walls (█), lava (~), or unseen areas (░) is not allowed.
+Remember, you can only manipulate objects that are directly in front of you, which is right above the symbol (^).
+Let’s think step by step. 
