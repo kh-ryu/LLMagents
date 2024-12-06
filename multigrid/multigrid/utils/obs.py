@@ -1,12 +1,19 @@
 import numba as nb
 import numpy as np
-
+from typing import Optional, Literal
 from ..core.agent import AgentState
 from ..core.constants import Color, Direction, State, Type
 from ..core.world_object import Wall, WorldObj
 
 from numpy.typing import NDArray as ndarray
+from ..core.actions import Action
 
+
+
+
+### Typing
+
+AgentID = int
 
 
 ### Constants
@@ -68,7 +75,8 @@ def  gen_obs_grid_encoding(
     grid_state: ndarray[np.int_],
     agent_state: ndarray[np.int_],
     agent_view_size: int,
-    see_through_walls: bool) -> ndarray[np.int_]:
+    see_through_walls: bool
+):
     """
     Generate encoding for the sub-grid observed by an agent (including visibility mask).
 
@@ -89,7 +97,7 @@ def  gen_obs_grid_encoding(
         Encoding of observed sub-grid for each agent
     """
     obs_grid = gen_obs_grid(grid_state, agent_state, agent_view_size)
-
+   
     # Generate and apply visibility masks
     vis_mask = get_vis_mask(obs_grid)
     num_agents = len(agent_state)
@@ -100,9 +108,9 @@ def  gen_obs_grid_encoding(
                     if not vis_mask[agent, i, j]:
                         obs_grid[agent, i, j] = UNSEEN_ENCODING
     
-
-    obs_text = obs_to_text(obs_grid, agent_state)
-
+  
+    obs_text = obs_to_text(obs_grid)
+   
     return obs_grid, obs_text
 
 
@@ -311,8 +319,7 @@ def obs_to_text(
 '''
 
 def obs_to_text(
-    obs_grid: ndarray[np.int_],
-    agent_states
+    obs_grid: ndarray[np.int_]
 ) -> list[str]:
     """
     Convert the observation grid to a human-readable text representation with dynamic alignment.
@@ -321,9 +328,7 @@ def obs_to_text(
     ----------
     obs_grid : ndarray[int] of shape (num_agents, width, height, encode_dim)
         Observed sub-grid for each agent.
-    agent_states : list[AgentState]
-        List of agent states, including attributes like color, direction, and position.
-
+        
     Returns
     -------
     descriptions : list[str]
@@ -332,7 +337,6 @@ def obs_to_text(
     # Extract dimensions
     num_agents, obs_width, obs_height, _ = obs_grid.shape
     descriptions = []
-   
 
     # Define symbol mapping for types
     type_symbols = {
@@ -350,24 +354,29 @@ def obs_to_text(
     }
 
     for agent in range(num_agents):
+    
+        agent_obs = ["Observation:"]  # Initialize agent-specific observation
+
+        agent_carrying_type = obs_grid[agent, obs_width // 2, obs_height - 1][TYPE]
+        agent_carrying_type = Type.from_index(agent_carrying_type).name
+
         # Collect content and calculate maximum width for each column
         cell_contents = [[None for _ in range(obs_height)] for _ in range(obs_width)]
         column_widths = [0] * obs_height
 
         for i in range(obs_width):
+
             for j in range(obs_height):
                 # Extract cell information
                 cell = obs_grid[agent, i, j]
                 cell_type_index = cell[TYPE]
                 cell_color_index = cell[COLOR]
                 cell_state_index = cell[STATE]
-
                 # Map indices to human-readable symbols
                 cell_type = Type.from_index(cell_type_index).name
                 cell_symbol = type_symbols.get(cell_type, "?")
                 cell_color = Color.from_index(cell_color_index).name
                 cell_state = State.from_index(cell_state_index).name
-
                 # Generate cell content
                 if [i, j] == [obs_width // 2, obs_height - 1]:  # Agent's position
                     cell_content = f"^(You, Carrying {cell_type})"
@@ -377,16 +386,15 @@ def obs_to_text(
                     cell_content = f"{cell_symbol}"
                 else:  # Generic object
                     cell_content = f"{cell_symbol} (Color: {cell_color}, State: {cell_state})"
-
-                # Store the content and update column width
+              
                 cell_contents[i][j] = cell_content
                 column_widths[j] = max(column_widths[j], len(cell_content))
 
+        # Rotate and flip the matrix for display
         rotated_matrix = [
             [cell_contents[j][i] for j in range(obs_width)]
             for i in range(obs_height - 1, -1, -1)
         ]
-      
         flipped_matrix = rotated_matrix[::-1]
         cell_contents = flipped_matrix
         
@@ -399,44 +407,19 @@ def obs_to_text(
         for row in cell_contents:
             for j, content in enumerate(row):
                 column_widths[j] = max(column_widths[j], len(content))
-
-        
-        
-        
-        
-        '''
-        # Generate table with updated dimensions
-        horizontal_line = "╔" + "╦".join("═" * (w + 2) for w in column_widths) + "╗"
-        middle_line = "╠" + "╬".join("═" * (w + 2) for w in column_widths) + "╣"
-        bottom_line = "╚" + "╩".join("═" * (w + 2) for w in column_widths) + "╝"
-
-        # Build the table for the rotated and mirrored matrix
-        agent_obs = [f"Observation:"]
-        agent_obs.append(horizontal_line)
-
-        for i, row in enumerate(cell_contents):
-            row_description = ["║"]
-            for j, content in enumerate(row):
-                row_description.append(f" {content.ljust(column_widths[j])} ║")
-            agent_obs.append("".join(row_description))
-            if i < new_obs_width - 1:
-                agent_obs.append(middle_line)
-
-        agent_obs.append(bottom_line)
-        descriptions.append("\n".join(agent_obs))
-        '''
+                
         # Generate the character-based list representation of the matrix
-        agent_obs = ["Observation:"]
-
         # Convert cell_contents into a nested string representation
         matrix_str = "[ " + ",\n  ".join([str(row) for row in cell_contents]) + " ]"
 
         # Add the formatted matrix string to agent_obs
         agent_obs.append(matrix_str)
 
+        # Append agent_obs to descriptions
         descriptions.append("\n".join(agent_obs))
 
     return descriptions
+  
     
 @nb.njit(cache=True)
 def get_see_behind_mask(grid_array: ndarray[np.int_]) -> ndarray[np.int_]:

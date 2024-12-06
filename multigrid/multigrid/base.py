@@ -91,7 +91,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
         height: int | None = None,
         max_steps: int = 100,
         see_through_walls: bool = False,
-        agent_view_size: int = 7,
+        agent_view_size: int = 3,
         allow_agent_overlap: bool = True,
         joint_reward: bool = False,
         success_termination_mode: Literal['any', 'all'] = 'any',
@@ -331,10 +331,14 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
             Additional information for each agent
         """
         self.step_count += 1
-        rewards = self.handle_actions(actions)
 
-        # Generate outputs
+        rewards, observations_handled_actions = self.handle_actions(actions)
+
         observations = self.gen_obs()
+        for agent, obs in observations_handled_actions.items():
+            observations[agent]["text"] = obs if len(obs.strip()) > 0 \
+                else observations[agent]["text"]
+        
         terminations = dict(enumerate(self.agent_states.terminated))
         truncated = self.step_count >= self.max_steps
         truncations = dict(enumerate(repeat(truncated, self.num_agents)))
@@ -346,6 +350,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
         return observations, rewards, terminations, truncations, defaultdict(dict)
 
     def gen_obs(self) -> dict[AgentID, ObsType]:
+        
         """
         Generate observations for each agent (partially observable, low-res encoding).
 
@@ -358,12 +363,12 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                 * 'mission': textual mission string (instructions for the agent)
         """
         direction = self.agent_states.dir
-
+        
         image, text = gen_obs_grid_encoding(
             self.grid.state,
             self.agent_states,
             self.agents[0].view_size,
-            self.agents[0].see_through_walls,
+            self.agents[0].see_through_walls
         )
 
         observations = {}
@@ -393,6 +398,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
             Reward for each agent
         """
         rewards = {agent_index: 0 for agent_index in range(self.num_agents)}
+        observations = {agent_index: "" for agent_index in range(self.num_agents)}
 
         # Randomize agent action order
         if self.num_agents == 1:
@@ -428,6 +434,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                         agent_present = np.bitwise_and.reduce(
                             self.agent_states.pos == fwd_pos, axis=1).any()
                         if agent_present:
+                            observations[i] = "Cannot move forward: Another agent is in the way. Please choose a different direction."
                             continue
 
                     agent.state.pos = fwd_pos
@@ -436,7 +443,9 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                             self.on_success(agent, rewards, {})
                         if fwd_obj.type == Type.lava:
                             self.on_failure(agent, rewards, {})
-
+                else:
+                    observations[i] = f"Cannot move forward: A {fwd_obj.type.name} is directly ahead, preventing further movement. Consider interacting or choosing a different path."
+                
             # Pick up an object
             elif action == Action.pickup:
                 fwd_pos = agent.front_pos
@@ -446,19 +455,39 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                     if agent.state.carrying is None:
                         agent.state.carrying = fwd_obj
                         self.grid.set(*fwd_pos, None)
+                    else:
+                        import pdb
+                        pdb.set_trace()
+                        observations[i] = f"Cannot pick up: you have already carrying {agent.state.carrying.type.name}."
+                else:
+                    observations[i] = f"Cannot pick up: The object '{fwd_obj.type.name}' cannot be picked up." if fwd_obj is not None \
+                       else "Cannot pick up: There is no object at the target position to pick up."
+
 
             # Drop an object
             elif action == Action.drop:
+                import pdb
+                pdb.set_trace()
                 fwd_pos = agent.front_pos
                 fwd_obj = self.grid.get(*fwd_pos)
 
-                if agent.state.carrying and fwd_obj is None:
-                    agent_present = np.bitwise_and.reduce(
-                        self.agent_states.pos == fwd_pos, axis=1).any()
-                    if not agent_present:
-                        self.grid.set(*fwd_pos, agent.state.carrying)
-                        agent.state.carrying.cur_pos = fwd_pos
-                        agent.state.carrying = None
+                if agent.state.carrying:
+                    if fwd_obj is None:
+                        agent_present = np.bitwise_and.reduce(
+                            self.agent_states.pos == fwd_pos, axis=1).any()
+                        if not agent_present:
+                            self.grid.set(*fwd_pos, agent.state.carrying)
+                            agent.state.carrying.cur_pos = fwd_pos
+                            agent.state.carrying = None
+                        else:
+                            observations[i] = "Cannot drop the object: The target position is already occupied by another agent, making it unavailable for placing the carried object."
+                    else:
+                        observations[i] = f"Cannot drop the object: The target position is occupied by {fwd_obj.type.name}, preventing the drop."
+                else:
+                    if fwd_obj is None:
+                        observations[i] = "Cannot drop: The agent is not carrying anything to drop."
+                    else:
+                        observations[i] = f"Cannot drop: The agent is not carrying anything, and the target position is already occupied by {fwd_obj.type.name}."
 
             # Toggle/activate an object
             elif action == Action.toggle:
@@ -467,6 +496,9 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
 
                 if fwd_obj is not None:
                     fwd_obj.toggle(self, agent, fwd_pos)
+                else:
+                    observations[i] = "Cannot toggle: No toggleable object is present at the target position."
+
 
             # Done action (not used by default)
             elif action == Action.done:
@@ -475,7 +507,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
             else:
                 raise ValueError(f"Unknown action: {action}")
 
-        return rewards
+        return rewards, observations
 
     def on_success(
         self,

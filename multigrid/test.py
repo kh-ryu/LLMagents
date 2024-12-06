@@ -88,11 +88,9 @@ ACTION_SPACE = {
 
 obs = "Let’s think step by step. You are on a grid now; please begin exploring the environment to gather some information about it."
 
-
 observations, infos = env.reset()
 done = False
 while not done:
-   
    messages.append({"role": "user", "content": obs})
    print(f"Observation: {obs}")
    response = client.chat.completions.create(
@@ -113,12 +111,9 @@ while not done:
       obs = "Failed to parse your action."
       continue
    
-
    observations, rewards, terminations, truncations, infos = env.step(action)
    
    obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
    done = any(terminations.values())
    
-
-
 env.close()
