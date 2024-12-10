@@ -340,23 +340,23 @@ def obs_to_text(
 
     # Define symbol mapping for types
     type_symbols = {
-        "unseen": "░",
-        "empty": ".", 
-        "wall": "█", 
-        "floor": ".", 
-        "door": "≡",
-        "key": "†",
-        "ball": "●", 
-        "box": "□", 
-        "goal": "★",
-        "lava": "~", 
-        "agent": "@", 
+        "unseen": "unseen",
+        "empty": "empty", 
+        "wall":  "wall", 
+        "floor": "floor", 
+        "door": "door",
+        "key": "key",
+        "ball": "ball", 
+        "box": "box", 
+        "goal": "goal",
+        "lava": "lava", 
+        "agent": "agent", 
     }
 
     for agent in range(num_agents):
     
         agent_obs = ["Observation:"]  # Initialize agent-specific observation
-
+        direct_observation = ""
         agent_carrying_type = obs_grid[agent, obs_width // 2, obs_height - 1][TYPE]
         agent_carrying_type = Type.from_index(agent_carrying_type).name
 
@@ -377,6 +377,14 @@ def obs_to_text(
                 cell_symbol = type_symbols.get(cell_type, "?")
                 cell_color = Color.from_index(cell_color_index).name
                 cell_state = State.from_index(cell_state_index).name
+                
+                if [i, j] == [obs_width // 2, obs_height - 2]:
+                    direct_observation += f"In front of you is {cell_type}\n"
+                elif [i, j] == [obs_width // 2 - 1, obs_height -1]:
+                    direct_observation += f"To your left is {cell_type}\n"
+                elif [i, j] == [obs_width // 2 + 1, obs_height - 1]:
+                    direct_observation += f"To your right is {cell_type}\n"
+
                 # Generate cell content
                 if [i, j] == [obs_width // 2, obs_height - 1]:  # Agent's position
                     cell_content = f"^(You, Carrying {cell_type})"
@@ -408,15 +416,9 @@ def obs_to_text(
             for j, content in enumerate(row):
                 column_widths[j] = max(column_widths[j], len(content))
                 
-        # Generate the character-based list representation of the matrix
-        # Convert cell_contents into a nested string representation
         matrix_str = "[ " + ",\n  ".join([str(row) for row in cell_contents]) + " ]"
-
-        # Add the formatted matrix string to agent_obs
         agent_obs.append(matrix_str)
-
-        # Append agent_obs to descriptions
-        descriptions.append("\n".join(agent_obs))
+        descriptions.append("Environment Observation:\n" + "\n".join(agent_obs) + '\n' + "Adjacent Grid Description:\n" + direct_observation)
 
     return descriptions
   

@@ -19,8 +19,6 @@ def gpt_interaction(client, gpt_model, system_string, user_string):
         )
         trial += 1
 
-    print(completion.choices[0].message.content)
-
     return completion.choices[0].message.content
 
 def save_string_to_file(save_path, string_file):

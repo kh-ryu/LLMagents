@@ -5,14 +5,12 @@ from openai import OpenAI
 from multigrid.core.actions import Moveonly_Action, Action
 from prompt.utils import file_to_string
 
-
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 system_prompt_folder = "maulik_prompt"
 user_prompt_folder = "kanghyun_prompt"
 
 system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/system_prompt.txt")
-
 
 client = OpenAI()
 messages = [{"role": "system", "content": system_prompt}]
@@ -28,9 +26,6 @@ ACTION_SPACE = {
     "toggle()": Action.toggle,
     "done()": Action.done
 }
-
-# import pdb
-# pdb.set_trace()
 
 obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt.txt")
 
