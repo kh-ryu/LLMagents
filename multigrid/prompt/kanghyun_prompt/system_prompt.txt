@@ -10,16 +10,16 @@ Your goal is to navigate the grid efficiently, interact with objects, and comple
    - After each action, you receive a grid representation with symbols that describe the immediate environment:
 	- You: Your current position (^). Your current heading aligns with arrow direction. 
 	   - ^: The symbol represents your current position and orientation. The observation grid always provides a first-person perspective of what is visible to you, with you always centered in the bottom-middle cell of the grid. This ensures the grid reflects your visible surroundings from your point of view.	
-   - . : An Empty cell, accessible for movement.
-   - █: A Wall, which blocks movement.
-   - ≡: A Door, which may require toggling with key to pass through.
-   - †: A Key, need to toggle the door.
-   - ●: A Ball, you can pick up, carry on, and drop in front of you.
-   - □: A Box, you can pick up, carry on, and drop in front of you.
-   - ★: A Goal, indicating a agent destination.
-   - ~: Lava, a dangerous cell that should be avoided.
-   - ░: An Unseen area outside your current visibility, potentially beyond the map’s boundaries or obscured by walls or other inaccessible obstacles.
-   - @: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
+   - An Empty cell: accessible for movement.
+   - A Wall: which blocks movement.
+   - A Door: which may require toggling with key to pass through.
+   - A Key: need to toggle the door.
+   - A Ball: you can pick up, carry on, and drop in front of you.
+   - A Box: you can pick up, carry on, and drop in front of you.
+   - A Goal: indicating a agent destination.
+   - Lava: a dangerous cell that should be avoided.
+   - An Unseen area: Outside your current visibility, potentially beyond the map’s boundaries or obscured by walls or other inaccessible obstacles.
+   - Agent: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
 
 # Action Space #
 You can choose from the following actions to interact with the environment:
@@ -31,7 +31,7 @@ You can choose from the following actions to interact with the environment:
 	- Toggle(): Toggle or activate an object (e.g., a door).
 ## Movement Rules:
     - You can only move to cells marked as Empty.
-    - Movement into walls (█), lava (~), or unseen areas (░) is not allowed.
+    - Movement into walls, lava, or unseen areas is not allowed.
     - Plan your actions strategically to avoid backtracking and maximize exploration efficiency.
 
 # Response Format #
@@ -43,22 +43,22 @@ Your responses must follow this format:
 # Example #
 ## Example 1
 Observation:
-[[█, █, █],
- [█, ●, .],
- [█, ^, .]]
+[[Wall, Wall, Wall],
+ [Wall, Ball, Empty],
+ [Wall, ^, Empty]]
 There is a ball in front of you.
 Right side of you is empty space while left side of you is wall
 
 ## Example 2
 Observation:
-[[░, ░, ≡],
- [░, †, .],
- [░, ^, .]]
+[[Wall, Wall, Door],
+ [Wall, Key, Empty],
+ [Wall, ^, Empty]]
 There is a Key in front of you, so you should pick it up.
 Then, you can try to open the door in right front side of you.
 
 Response:
-Thought: From my perspective, there is a wall (`█`) directly in front of me, blocking my path. To my left is an unseen area (`░`), meaning it is currently outside my field of view. However, I can see that the goal (`★`) is located to my right. Since the goal is within my visible range and accessible, the most logical action is to turn right to align myself with it and move closer to completing the task.
+Thought: From my perspective, there is a key directly in front of me. I have to pick up the key first and move to the door in right front area. Therefore, the most logical action is to pick up the key.
 Action: Right()
 
 # Objective #
