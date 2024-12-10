@@ -1,0 +1,328 @@
+2024-12-09 18:02:32,920 - INFO - Agent 0 Observation: You are begining to solve the task now. Please explore the environment and try to pick up the goal.
+2024-12-09 18:02:35,318 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:35,323 - INFO - Agent 0 Response: Observation:
+```
+[[░, ░, ░],
+ [░, ░, ░],
+ [░, ^, ░]]
+```
+
+Thought: I am currently in an unexplored area with all surrounding cells marked as unseen (`░`). To begin exploring, I should move forward to uncover more of the environment.
+
+Action: Forward()
+2024-12-09 18:02:35,324 - INFO - Agent 1 Observation: You are begining to solve the task now. Please explore the environment and try to pick up the goal.
+2024-12-09 18:02:37,791 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:37,792 - INFO - Agent 1 Response: Observation:
+```
+[[░, ░, ░],
+ [░, ░, ░],
+ [░, ^, ░]]
+```
+
+Thought: I am currently in an unexplored area with all surrounding cells marked as unseen (`░`). To begin exploring, I should move forward to uncover more of the environment.
+
+Action: Forward()
+2024-12-09 18:02:37,815 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:38,928 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:38,929 - INFO - Agent 0 Response: Thought: I am currently facing an empty cell, with a wall to my left and another empty cell to my right. Since moving forward will allow me to explore more of the environment, I will proceed in that direction.
+
+Action: Forward()
+2024-12-09 18:02:38,929 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'key (Color: blue, State: open)', 'empty'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is key
+To your right is empty
+
+2024-12-09 18:02:40,501 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:40,504 - INFO - Agent 1 Response: Thought: I am currently facing a key in front of me, which is blue and in an open state. Since I am not carrying anything, I can pick up the key. This will likely be useful for interacting with doors later on. After picking up the key, I can continue exploring the environment.
+
+Action: Pickup()
+2024-12-09 18:02:40,515 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'wall'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:41,769 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:41,772 - INFO - Agent 0 Response: Thought: I am still facing an empty cell, with a wall to my left and another empty cell to my right. Since moving forward will continue to reveal more of the environment, I will proceed in that direction.
+
+Action: Forward()
+2024-12-09 18:02:41,772 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:43,078 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:43,080 - INFO - Agent 1 Response: Thought: I have successfully picked up the key and am now carrying it. The path in front of me is clear, and there is also an empty space to my right. To continue exploring efficiently, I will move forward to uncover more of the environment.
+
+Action: Forward()
+2024-12-09 18:02:43,090 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['unseen', 'unseen', 'unseen'],
+  ['wall', 'wall', 'wall'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is wall
+To your right is empty
+
+2024-12-09 18:02:44,126 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:44,128 - INFO - Agent 0 Response: Thought: I have encountered a wall directly in front of me, which blocks my path. To continue exploring, I should turn right, as there is an empty cell in that direction.
+
+Action: Right()
+2024-12-09 18:02:44,129 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'wall'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:45,353 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:45,354 - INFO - Agent 1 Response: Thought: I am currently facing an empty space, with walls to my left and an empty space to my right. Since the path in front of me is clear, I will continue moving forward to explore more of the environment.
+
+Action: Forward()
+2024-12-09 18:02:45,470 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['door (Color: blue, State: locked)', 'ball (Color: red, State: open)', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:47,079 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:47,080 - INFO - Agent 0 Response: Thought: I am now facing an empty cell, with a wall to my left and another empty cell to my right. I can see a red ball and a locked blue door in the distance. Since there is an empty cell in front of me, I will move forward to get closer to the ball and door, which may be important for completing the task.
+
+Action: Forward()
+2024-12-09 18:02:47,080 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['unseen', 'unseen', 'unseen'],
+  ['wall', 'wall', 'wall'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is wall
+To your right is empty
+
+2024-12-09 18:02:48,266 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:48,267 - INFO - Agent 1 Response: Thought: I have encountered a wall directly in front of me, which blocks my path. To continue exploring, I should turn right, as there is an empty space in that direction. This will allow me to navigate around the wall and potentially discover new areas.
+
+Action: Right()
+2024-12-09 18:02:48,323 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['door (Color: blue, State: locked)', 'ball (Color: red, State: open)', 'empty'],
+  ['wall', '^(You, Carrying empty)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is ball
+To your right is empty
+
+2024-12-09 18:02:49,448 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:49,449 - INFO - Agent 0 Response: Thought: I am now directly in front of a red ball. Since I am not currently carrying anything, I should pick up the ball. This will allow me to carry it with me and potentially use it later in the task.
+
+Action: Pickup()
+2024-12-09 18:02:49,449 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:50,574 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:50,577 - INFO - Agent 1 Response: Thought: I have turned right and now face an empty space, with another empty space to my right and a wall to my left. To continue exploring and uncover more of the environment, I will move forward.
+
+Action: Forward()
+2024-12-09 18:02:50,603 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['door (Color: blue, State: locked)', 'empty', 'empty'],
+  ['wall', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:52,282 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:52,284 - INFO - Agent 0 Response: Thought: I have successfully picked up the red ball. Now, I am facing an empty cell, with a wall to my left and another empty cell to my right. To continue exploring and potentially find a way to unlock the blue door, I will move forward.
+
+Action: Forward()
+2024-12-09 18:02:52,284 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:53,546 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:53,548 - INFO - Agent 1 Response: Thought: I am still facing an empty space, with another empty space to my right and a wall to my left. Since the path in front of me is clear, I will continue moving forward to explore further.
+
+Action: Forward()
+2024-12-09 18:02:53,565 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'wall'],
+  ['wall', 'empty', 'empty'],
+  ['door (Color: blue, State: locked)', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is door
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:55,080 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:55,080 - INFO - Agent 0 Response: Thought: I am currently facing an empty cell, with a locked blue door to my left and another empty cell to my right. Since I am carrying a ball and not a key, I cannot unlock the door at this moment. I will continue exploring by moving forward to uncover more of the environment.
+
+Action: Forward()
+2024-12-09 18:02:55,081 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'wall'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:56,328 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:56,332 - INFO - Agent 1 Response: Thought: I have encountered another wall directly in front of me, which blocks my path. To continue exploring, I should turn right, as there is an empty space in that direction. This will allow me to navigate around the wall and potentially discover new areas.
+
+Action: Right()
+2024-12-09 18:02:56,408 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['unseen', 'unseen', 'unseen'],
+  ['wall', 'wall', 'wall'],
+  ['wall', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is wall
+To your right is empty
+
+2024-12-09 18:02:57,641 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:57,642 - INFO - Agent 0 Response: Thought: I have encountered a wall directly in front of me, which blocks my path. To continue exploring, I should turn right, as there is an empty cell in that direction.
+
+Action: Right()
+2024-12-09 18:02:57,642 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['empty', 'empty', 'empty'],
+  ['empty', 'empty', 'empty'],
+  ['empty', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is empty
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:58,562 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:58,564 - INFO - Agent 1 Response: Thought: I am now in an open area with empty spaces in all directions. To maximize exploration and uncover more of the environment, I will move forward.
+
+Action: Forward()
+2024-12-09 18:02:58,640 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:02:59,996 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:02:59,998 - INFO - Agent 0 Response: Thought: I am now facing an empty cell, with a wall to my left and another empty cell to my right. Since there is an empty cell in front of me, I will move forward to continue exploring the environment.
+
+Action: Forward()
+2024-12-09 18:02:59,998 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['empty', 'empty', 'empty'],
+  ['empty', 'empty', 'empty'],
+  ['empty', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is empty
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:03:01,429 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:03:01,432 - INFO - Agent 1 Response: Thought: I am still in an open area with empty spaces in all directions. To continue exploring and potentially find the goal, I will move forward again.
+
+Action: Forward()
+2024-12-09 18:03:01,440 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'empty', 'empty'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:03:02,658 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:03:02,659 - INFO - Agent 0 Response: Thought: I am still facing an empty cell, with a wall to my left and another empty cell to my right. Since moving forward will continue to reveal more of the environment, I will proceed in that direction.
+
+Action: Forward()
+2024-12-09 18:03:02,659 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'door (Color: blue, State: locked)'],
+  ['empty', 'empty', 'empty'],
+  ['empty', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is empty
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:03:04,091 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:03:04,093 - INFO - Agent 1 Response: Thought: I have discovered a door to my right, which is blue and currently locked. Since I am carrying a blue key, I can use it to unlock the door. To do this, I will first turn right to face the door, and then I can use the key to unlock it.
+
+Action: Right()
+2024-12-09 18:03:04,195 - INFO - Agent 0 Observation: Environment Observation:
+
+[ ['wall', 'wall', 'wall'],
+  ['wall', 'empty', 'empty'],
+  ['wall', '^(You, Carrying ball)', 'empty'] ]
+Adjacent Grid Description:
+To your left is wall
+In front of you is empty
+To your right is empty
+
+2024-12-09 18:03:05,796 - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2024-12-09 18:03:05,798 - INFO - Agent 0 Response: Thought: I am facing an empty cell, with a wall to my left and another empty cell to my right. Since there is an empty cell in front of me, I will move forward to continue exploring the environment.
+
+Action: Forward()
+2024-12-09 18:03:05,798 - INFO - Agent 1 Observation: Environment Observation:
+
+[ ['empty', 'empty', 'agent (Color: red, State: locked)'],
+  ['empty', 'empty', 'empty'],
+  ['empty', '^(You, Carrying key)', 'empty'] ]
+Adjacent Grid Description:
+To your left is empty
+In front of you is empty
+To your right is empty
+

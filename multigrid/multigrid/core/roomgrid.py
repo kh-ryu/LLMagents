@@ -145,8 +145,8 @@ class RoomGrid(MultiGridEnv):
     def __init__(
         self,
         room_size: int = 7,
-        num_rows: int = 3,
-        num_cols: int = 3,
+        num_rows: int = 11,
+        num_cols: int = 11,
         **kwargs):
         """
         Parameters

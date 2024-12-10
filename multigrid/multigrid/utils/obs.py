@@ -376,8 +376,10 @@ def obs_to_text(
                 cell_type = Type.from_index(cell_type_index).name
                 cell_symbol = type_symbols.get(cell_type, "?")
                 cell_color = Color.from_index(cell_color_index).name
-                cell_state = State.from_index(cell_state_index).name
-                
+                try:
+                    cell_state = State.from_index(cell_state_index).name
+                except:
+                    cell_state = ""
                 if [i, j] == [obs_width // 2, obs_height - 2]:
                     direct_observation += f"In front of you is {cell_type}\n"
                 elif [i, j] == [obs_width // 2 - 1, obs_height -1]:
@@ -393,7 +395,7 @@ def obs_to_text(
                 elif cell_type == "unseen" or cell_type == "wall":  # Unseen cell
                     cell_content = f"{cell_symbol}"
                 else:  # Generic object
-                    cell_content = f"{cell_symbol} (Color: {cell_color}, State: {cell_state})"
+                    cell_content = f"{cell_symbol} (Color: {cell_color}, State: {cell_state})" if cell_state else f"{cell_symbol} (Color: {cell_color}"
               
                 cell_contents[i][j] = cell_content
                 column_widths[j] = max(column_widths[j], len(cell_content))
