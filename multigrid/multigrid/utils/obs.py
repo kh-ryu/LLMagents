@@ -355,7 +355,7 @@ def obs_to_text(
 
     for agent in range(num_agents):
     
-        agent_obs = ["Observation:"]  # Initialize agent-specific observation
+        agent_obs = ["Environment Observation:\n"]  # Initialize agent-specific observation
         direct_observation = ""
         agent_carrying_type = obs_grid[agent, obs_width // 2, obs_height - 1][TYPE]
         agent_carrying_type = Type.from_index(agent_carrying_type).name
@@ -418,7 +418,7 @@ def obs_to_text(
                 
         matrix_str = "[ " + ",\n  ".join([str(row) for row in cell_contents]) + " ]"
         agent_obs.append(matrix_str)
-        descriptions.append("Environment Observation:\n" + "\n".join(agent_obs) + '\n' + "Adjacent Grid Description:\n" + direct_observation)
+        descriptions.append("\n".join(agent_obs) + '\n' + "Adjacent Grid Description:\n" + direct_observation)
 
     return descriptions
   
