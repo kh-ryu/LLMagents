@@ -5,6 +5,7 @@ from multigrid.core.mission import MissionSpace
 from multigrid.core.roomgrid import RoomGrid
 from multigrid.core.world_object import Ball
 
+import numpy as np
 
 
 class BlockedUnlockPickupEnv(RoomGrid):
@@ -152,13 +153,14 @@ class BlockedUnlockPickupEnv(RoomGrid):
         self.obj, _ = self.add_object(1, 0, kind=Type.goal)
 
         # Make sure the two rooms are directly connected by a locked door
-        door, pos = self.add_door(0, 0, Direction.right, locked=True)
+        self.door, pos = self.add_door(0, 0, Direction.right, locked=True)
 
         # Block the door with a ball
-        self.grid.set(pos[0] - 1, pos[1], Ball(color=self._rand_color()))
+        self.ball = Ball(color=self._rand_color())
+        self.grid.set(pos[0] - 1, pos[1], self.ball)
 
         # Add a key to unlock the door
-        self.add_object(0, 0, Type.key, door.color)
+        self.key, pos = self.add_object(0, 0, Type.key, self.door.color)
 
         # Place agents in the left room
         for agent in self.agents:
@@ -171,8 +173,27 @@ class BlockedUnlockPickupEnv(RoomGrid):
         :meta private:
         """
         obs, reward, terminated, truncated, info = super().step(actions)
+        print(self.ball.cur_pos)
+        print(self.door.cur_pos)
+        print(self.key.cur_pos)
         for agent in self.agents:
             if agent.state.carrying == self.obj:
                 self.on_success(agent, reward, terminated)
 
         return obs, reward, terminated, truncated, info
+    
+    # Add functions that can detect main events in the game
+    def ball_moved(self):
+        is_moved = False
+        if self.ball.cur_pos is not None:
+            if self.ball.cur_pos[0] != self.door.cur_pos[0] - 1 or self.ball.cur_pos[1] != self.door.cur_pos[1]:
+                is_moved = True
+
+        return is_moved
+    
+    def door_open(self):
+        is_opened = False
+        if self.door.is_open:
+            is_opened = True
+
+        return is_opened

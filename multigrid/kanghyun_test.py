@@ -32,25 +32,25 @@ ACTION_SPACE = {
 obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_ball.txt")
 
 observations, infos = env.reset()
+text_obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
 done = False
+is_ball_moved = False
+is_door_open = False
+history = [{"role": "user", "content": text_obs}]
+
 while not done:
-   # Get keyboard input
-   task = input("Enter your action: ")
-   if task == "ball":
-      obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_ball.txt")
-      messages = [{"role": "system", "content": system_prompt}]
-   elif task == "key":
-      obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_key.txt")
-      messages = [{"role": "system", "content": system_prompt}]
-   elif task == "goal":
-      obs = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_goal.txt")
-      messages = [{"role": "system", "content": system_prompt}]
+   if is_ball_moved is False and is_door_open is False:
+      user = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_ball.txt")
+      prompt = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user}]
+   elif is_ball_moved is True and is_door_open is False:
+      user = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_key.txt")
+      prompt = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user}]
+   elif is_ball_moved is True and is_door_open is True:
+      user = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_goal.txt")
+      prompt = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user}]
 
-   text_obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
-   obs = f"{obs}\n{text_obs}"
-
-   messages.append({"role": "user", "content": obs})
-   print(f"Observation: {obs}")
+   messages = prompt + history
+   print(f"Messages: {messages}")
    response = gpt_interaction(client, "gpt-4o", messages)
    messages.append({"role": "assistant", "content": response})
    print(f"Assistant: {response}")
@@ -64,8 +64,12 @@ while not done:
       continue
    
    observations, rewards, terminations, truncations, infos = env.step(action)
-   
-   obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
+   text_obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
+   history.append({"role": "user", "content": text_obs})
+
+   is_ball_moved = env.ball_moved()
+   is_door_open = env.door_open()
+
    done = any(terminations.values())
    
 env.close()
