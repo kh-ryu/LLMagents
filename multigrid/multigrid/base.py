@@ -456,8 +456,6 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                         agent.state.carrying = fwd_obj
                         self.grid.set(*fwd_pos, None)
                     else:
-                        import pdb
-                        pdb.set_trace()
                         observations[i] = f"Cannot pick up: you have already carrying {agent.state.carrying.type.name}."
                 else:
                     observations[i] = f"Cannot pick up: The object '{fwd_obj.type.name}' cannot be picked up." if fwd_obj is not None \
@@ -466,8 +464,6 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
 
             # Drop an object
             elif action == Action.drop:
-                import pdb
-                pdb.set_trace()
                 fwd_pos = agent.front_pos
                 fwd_obj = self.grid.get(*fwd_pos)
 
