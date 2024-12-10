@@ -76,7 +76,6 @@ class Agent:
 
         # Number of cells (width and height) in the agent view
         assert view_size % 2 == 1
-        assert view_size >= 3
         self.view_size = view_size
         self.see_through_walls = see_through_walls
 
