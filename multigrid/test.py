@@ -64,18 +64,19 @@ class LLMAgent(Agent):
          if match:
             action = match.group(1)
             action = ACTION_SPACE[action.lower().strip()]
+         if not action or not match:
             break
          else:
             obs = "Failed to parse your action."
             continue
-      
+        
       self.messages.append({"role": "assistant", "content": response})
       return action
          
       
 mission = MissionSpace.from_string("Pick up the goal")
 agents = [LLMAgent(system_prompt=system_prompt, index=0, mission_space=mission, view_size=3), 
-          LLMAgent(system_prompt=system_prompt,index=1, mission_space=mission, view_size=1)]
+          LLMAgent(system_prompt=system_prompt,index=1, mission_space=mission, view_size=3)]
 
 env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human')
 env = env.unwrapped
@@ -98,7 +99,7 @@ while not done:
    for agent_index, observation in observations.items():
       obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
       
-      
+   
 
    done = any([rewards[idx] for idx in rewards.keys()])
    
