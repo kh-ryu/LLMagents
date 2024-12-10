@@ -12,7 +12,9 @@ def gpt_interaction(client, gpt_model, messages):
     while completion is None and trial < 5:
         completion = client.chat.completions.create(
             model=gpt_model,
-            messages=messages
+            messages=messages,
+            max_tokens=1000,
+            temperature=0.5,
         )
         trial += 1
 

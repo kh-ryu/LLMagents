@@ -2,6 +2,6 @@ You are on a grid now; please begin exploring the environment to gather some inf
 Your current goal is to pick up the ball blocking the door and drop at the any other place.
 After you pick up the ball, drop it to any place that doesn't block the door
 Remember, you can only move to adjacent cells marked as Empty.
-Movement into walls (█), lava (~), or unseen areas (░) is not allowed.
+Movement into walls, lava, or unseen areas is not allowed.
 Remember, you can only manipulate objects that are directly in front of you, which is right above the symbol (^)
 Let’s think step by step. 
