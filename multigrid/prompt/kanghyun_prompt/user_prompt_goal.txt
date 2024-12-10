@@ -1,0 +1,7 @@
+You are on a grid now; please begin exploring the environment to gather some information about it.
+Now you opened the door, so you should pass through the door and navigate to the goal place in the other room.
+You should get into the goal region to finish the task.
+Remember, you can only move to the front cell marked as Empty.
+Movement into walls (█), lava (~), or unseen areas (░) is not allowed.
+Remember, you can only manipulate objects that are directly in front of you, which is right above the symbol (^).
+Let’s think step by step. 
