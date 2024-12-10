@@ -64,12 +64,15 @@ class LLMAgent(Agent):
          if match:
             action = match.group(1)
             action = ACTION_SPACE[action.lower().strip()]
-         if not action or not match:
-            break
+            if action:
+               break
+            else:
+               obs = "Failed to parse your action."
+               continue
          else:
             obs = "Failed to parse your action."
             continue
-        
+      
       self.messages.append({"role": "assistant", "content": response})
       return action
          
