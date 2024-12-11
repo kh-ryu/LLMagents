@@ -50,7 +50,7 @@ while not done:
       prompt = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user}]
 
    messages = prompt + history
-   print(f"Messages: {messages}")
+   print(f"Observation: {text_obs}")
    response = gpt_interaction(client, "gpt-4o", messages)
    messages.append({"role": "assistant", "content": response})
    print(f"Assistant: {response}")
