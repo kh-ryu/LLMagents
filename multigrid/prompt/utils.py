@@ -1,5 +1,6 @@
 import openai
 import os
+import re
 
 def file_to_string(filename):
     with open(filename, 'r', encoding='utf-8') as file:
@@ -24,3 +25,14 @@ def save_string_to_file(save_path, string_file):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     with open(save_path, 'w') as file:
         file.write(string_file)
+
+def parse_action(response, action_space):
+    pattern = r"Action:\s*([A-Za-z]+\(.*?\))"
+    match = re.search(pattern, response)
+    if match:
+        action = match.group(1)
+        action = {0: action_space[action.lower().strip()]}
+    else:
+        print("Failed to parse your action.")
+        action = None
+    return action

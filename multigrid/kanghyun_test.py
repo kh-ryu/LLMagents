@@ -3,7 +3,7 @@ import multigrid.envs
 import openai, os, re
 from openai import OpenAI
 from multigrid.core.actions import Moveonly_Action, Action
-from prompt.utils import file_to_string, gpt_interaction
+from prompt.utils import file_to_string, gpt_interaction, parse_action
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -37,6 +37,7 @@ done = False
 is_ball_moved = False
 is_door_open = False
 history = [{"role": "user", "content": text_obs}]
+history_max_len = 10
 
 while not done:
    if is_ball_moved is False and is_door_open is False:
@@ -52,20 +53,18 @@ while not done:
    messages = prompt + history
    print(f"Observation: {text_obs}")
    response = gpt_interaction(client, "gpt-4o", messages)
-   messages.append({"role": "assistant", "content": response})
+   history.append({"role": "assistant", "content": response})
    print(f"Assistant: {response}")
-   pattern = r"Action:\s*([A-Za-z]+\(.*?\))"
-   match = re.search(pattern, response)
-   if match:
-      action = match.group(1)
-      action = {0: ACTION_SPACE[action.lower().strip()]}
-   else:
+   action = parse_action(response, ACTION_SPACE)
+   if action is None:
       obs = "Failed to parse your action."
       continue
    
    observations, rewards, terminations, truncations, infos = env.step(action)
    text_obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
    history.append({"role": "user", "content": text_obs})
+   if len(history) > history_max_len:
+      history = history[-history_max_len:]
 
    is_ball_moved = env.ball_moved()
    is_door_open = env.door_open()
