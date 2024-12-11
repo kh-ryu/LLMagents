@@ -173,9 +173,6 @@ class BlockedUnlockPickupEnv(RoomGrid):
         :meta private:
         """
         obs, reward, terminated, truncated, info = super().step(actions)
-        print(self.ball.cur_pos)
-        print(self.door.cur_pos)
-        print(self.key.cur_pos)
         for agent in self.agents:
             if agent.state.carrying == self.obj:
                 self.on_success(agent, reward, terminated)
