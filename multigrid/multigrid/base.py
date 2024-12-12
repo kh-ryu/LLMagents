@@ -450,9 +450,11 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
             elif action == Action.pickup:
                 fwd_pos = agent.front_pos
                 fwd_obj = self.grid.get(*fwd_pos)
-
                 if fwd_obj is not None and fwd_obj.can_pickup():
-                    if agent.state.carrying is None:
+                    if fwd_obj.type in agent.restricted_obj:
+                        observations[i] = f"You cannot pick up: The object '{fwd_obj.type.name}' is restricted for you to pick up." if fwd_obj is not None \
+                            else "Cannot pick up: There is no object at the target position to pick up."                  
+                    elif agent.state.carrying is None:
                         agent.state.carrying = fwd_obj
                         self.grid.set(*fwd_pos, None)
                     else:
@@ -460,8 +462,6 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                 else:
                     observations[i] = f"Cannot pick up: The object '{fwd_obj.type.name}' cannot be picked up." if fwd_obj is not None \
                        else "Cannot pick up: There is no object at the target position to pick up."
-
-
             # Drop an object
             elif action == Action.drop:
                 fwd_pos = agent.front_pos
@@ -484,7 +484,7 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                         observations[i] = "Cannot drop: The agent is not carrying anything to drop."
                     else:
                         observations[i] = f"Cannot drop: The agent is not carrying anything, and the target position is already occupied by {fwd_obj.type.name}."
-
+                        
             # Toggle/activate an object
             elif action == Action.toggle:
                 fwd_pos = agent.front_pos
@@ -494,7 +494,6 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                     fwd_obj.toggle(self, agent, fwd_pos)
                 else:
                     observations[i] = "Cannot toggle: No toggleable object is present at the target position."
-
 
             # Done action (not used by default)
             elif action == Action.done:
@@ -690,7 +689,8 @@ class MultiGridEnv(gym.Env, RandomMixin, ABC):
                 continue
 
             break
-
+        
+        
         self.grid.set(pos[0], pos[1], obj)
 
         if obj is not None:

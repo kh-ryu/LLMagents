@@ -1,8 +1,15 @@
 import gymnasium as gym
 import multigrid.envs
+import openai, os, re
+import logging
+from openai import OpenAI
 from multigrid.core.actions import Moveonly_Action, Action
+from prompt.utils import file_to_string
+from multigrid.core.agent import Agent, MissionSpace
+import time
 
-env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=1, render_mode='human')
+
+env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=[Agent(restricted_obj=["ball"], index=0)], render_mode='human')
 env = env.unwrapped
 
 ACTION_SPACE = {
