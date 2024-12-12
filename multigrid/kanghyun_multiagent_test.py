@@ -93,11 +93,14 @@ class LLMAgent(Agent):
       
       self.messages.append({"role": "assistant", "content": response})
       return action
+   
+   def talk(self, messages):
+      pass
          
       
 mission = MissionSpace.from_string("Pick up the goal")
-agents = [LLMAgent(role='ball', index=0, mission_space=mission, view_size=3), 
-          LLMAgent(role='key', index=1, mission_space=mission, view_size=3)]
+agents = [LLMAgent(role='ball', index=0, mission_space=mission, view_size=3, restricted_obj=["ball"]), 
+          LLMAgent(role='key', index=1, mission_space=mission, view_size=3, restricted_obj=["key"])]
 
 env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human')
 env = env.unwrapped
