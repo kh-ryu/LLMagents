@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import numpy as np
-
+from typing import List
 from gymnasium import spaces
 from numpy.typing import ArrayLike, NDArray as ndarray
-
+from typing import Optional, Union
 from .actions import Action
 from .constants import Color, Direction, Type
 from .mission import Mission, MissionSpace
 from .world_object import WorldObj
+from .constants import Type
 
 from ..utils.misc import front_pos, PropertyAlias
 from ..utils.rendering import (
@@ -16,8 +17,6 @@ from ..utils.rendering import (
     point_in_triangle,
     rotate_fn,
 )
-
-
 
 class Agent:
     """
@@ -57,6 +56,7 @@ class Agent:
         index: int,
         mission_space: MissionSpace = MissionSpace.from_string('maximize reward'),
         view_size: int = 3,
+        restricted_obj: List[Union[Type, str]] =[],
         see_through_walls: bool = False):
         """
         Parameters
@@ -91,7 +91,9 @@ class Agent:
             'direction': spaces.Discrete(len(Direction)),
             'mission': mission_space,
         })
-
+        
+        self.restricted_obj = []
+        self.load_restricted_obj(restricted_obj)
         # Actions are discrete integer values
         self.action_space = spaces.Discrete(len(Action))
 
@@ -106,7 +108,8 @@ class Agent:
         'state', 'terminated', doc='Alias for :attr:`AgentState.terminated`.')
     carrying = PropertyAlias(
         'state', 'carrying', doc='Alias for :attr:`AgentState.carrying`.')
-
+    
+    
     @property
     def front_pos(self) -> tuple[int, int]:
         """
@@ -115,6 +118,20 @@ class Agent:
         agent_dir = self.state._view[AgentState.DIR]
         agent_pos = self.state._view[AgentState.POS]
         return front_pos(*agent_pos, agent_dir)
+    
+    
+    def load_restricted_obj(self, restricted_obj):
+        for obj in restricted_obj:
+            if isinstance(obj, str):
+                for item in Type:
+                    if item.name.lower() == obj.lower():
+                        self.restricted_obj.append(item)
+                        break
+            elif isinstance(obj, Type):
+                self.restricted_obj.append(obj)
+            elif isinstance(obj, WorldObj):
+                self.restricted_obj.append(obj.type)
+
 
     def reset(self, mission: Mission = Mission('maximize reward')):
         """

@@ -6,8 +6,7 @@ from openai import OpenAI
 from multigrid.core.actions import Moveonly_Action, Action
 from prompt.utils import file_to_string
 from multigrid.core.agent import Agent, MissionSpace
-
-
+import time
 
 log_file = "agent_log.log"
 
@@ -48,7 +47,7 @@ class LLMAgent(Agent):
       self.messages.append({"role": "user", "content": obs})
       logging.info(f"Agent {self.index} Observation: {obs}")
       
-      for i in range(3):
+      for i in range(5):
          response = self.llm.chat.completions.create(
             model='gpt-4o',
             messages=self.messages,
@@ -56,7 +55,7 @@ class LLMAgent(Agent):
             temperature=0.0,
             top_p=0.9
          ).choices[0].message.content
-         
+         time.sleep(1)
          messages.append({"role": "assistant", "content": response})
          logging.info(f"Agent {self.index} Response: {response}")
          pattern = r"Action:\s*([A-Za-z]+\(.*?\))"
@@ -75,7 +74,7 @@ class LLMAgent(Agent):
       
       self.messages.append({"role": "assistant", "content": response})
       return action
-         
+
       
 mission = MissionSpace.from_string("Pick up the goal")
 agents = [LLMAgent(system_prompt=system_prompt, index=0, mission_space=mission, view_size=3), 
@@ -92,18 +91,15 @@ observations, infos = env.reset()
 done = False
 while not done:
    actions = {}
-
+   
    for agent in agents:
       action = agent.response(obs[agent.index])
-      assert action
       actions[agent.index] = action
    
    observations, rewards, terminations, truncations, infos = env.step(actions)
    for agent_index, observation in observations.items():
       obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
       
-   
-
    done = any([rewards[idx] for idx in rewards.keys()])
    
 env.close()
