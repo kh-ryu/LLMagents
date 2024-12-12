@@ -27,23 +27,23 @@ key_agent_user_prompt = f"./prompt/{system_prompt_folder}/key_agent_user.txt"
 ball_agent_user_prompt = f"./prompt/{system_prompt_folder}/ball_agent_user.txt"
 
 ACTION_SPACE_KEY = {
-    "left()": Action.left,
-    "right()": Action.right,
-    "forward()": Action.forward,
-    "pickup()": Action.pickup,
-    "drop()": Action.drop,
-    "toggle()": Action.toggle,
-    "done()": Action.done
+   "left()": Action.left,
+   "right()": Action.right,
+   "forward()": Action.forward,
+   "pickup()": Action.pickup,
+   "drop()": Action.drop,
+   "toggle()": Action.toggle,
+   "done()": Action.done
 }
 
 ACTION_SPACE_BALL = {
-    "left()": Action.left,
-    "right()": Action.right,
-    "forward()": Action.forward,
-    "pickup()": Action.pickup,
-    "drop()": Action.drop,
-    "toggle()": Action.toggle,
-    "done()": Action.done
+   "left()": Action.left,
+   "right()": Action.right,
+   "forward()": Action.forward,
+   "pickup()": Action.pickup,
+   "drop()": Action.drop,
+   "toggle()": Action.toggle,
+   "done()": Action.done
 }
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -65,33 +65,36 @@ class LLMAgent(Agent):
       self.messages = [{"role": "system", "content": self.system_prompt},
                        {"role": "user", "content": self.user_prompt}]
       
+      self.history = []
+      
    def response(self, obs):
       action = None
-      messages = self.messages.copy()
-      messages.append({"role": "user", "content": obs})
-      self.messages.append({"role": "user", "content": obs})
-      logging.info(f"Agent {self.index} Observation: {obs}")
+      self.history.append({"role": "user", "content": obs})
+      # logging.info(f"Agent {self.index} Observation: {obs}")
+      print(f"Agent {self.index} Color: ", self.color)
+      print(f"Agent {self.index} Observation: ", obs)
       
       for i in range(3):
-         response = gpt_interaction(self.llm, "gpt-4o", messages)
-         print("response:", response)
-         messages.append({"role": "assistant", "content": response})
-         logging.info(f"Agent {self.index} Response: {response}")
+         response = gpt_interaction(self.llm, "gpt-4o", self.messages + self.history)
+         print(f"Agent {self.index} Response: ", response)
+         # logging.info(f"Agent {self.index} Response: {response}")
          pattern = r"Action:\s*([A-Za-z]+\(.*?\))"
          match = re.search(pattern, response)
          if match:
             action = match.group(1)
-            action = self.action[action.lower().strip()]
-            if action:
+            try:
+               action = self.action[action.lower().strip()]
                break
-            else:
+            except:
+               action = None
                obs = "Failed to parse your action."
                continue
          else:
             obs = "Failed to parse your action."
             continue
       
-      self.messages.append({"role": "assistant", "content": response})
+      self.history.append({"role": "assistant", "content": response})
+      self.history = self.history[-5:]
       return action
    
    def talk(self, messages):
@@ -99,8 +102,8 @@ class LLMAgent(Agent):
          
       
 mission = MissionSpace.from_string("Pick up the goal")
-agents = [LLMAgent(role='ball', index=0, mission_space=mission, view_size=3, restricted_obj=["ball"]), 
-          LLMAgent(role='key', index=1, mission_space=mission, view_size=3, restricted_obj=["key"])]
+agents = [LLMAgent(role='ball', color = "blue", index=0, mission_space=mission, view_size=3, restricted_obj=["key"]), 
+          LLMAgent(role='key', color="green", index=1, mission_space=mission, view_size=3, restricted_obj=["ball"])]
 
 env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human')
 env = env.unwrapped

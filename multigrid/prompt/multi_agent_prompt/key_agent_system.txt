@@ -28,7 +28,6 @@ Then, you can move to the other room to search for goal area.
    - A Ball: you can pick up, carry on, and drop in front of you.
    - A Box: you can pick up, carry on, and drop in front of you.
    - A Goal: indicating a agent destination.
-   - Lava: a dangerous cell that should be avoided.
    - An Unseen area: Outside your current visibility, potentially beyond the map’s boundaries or obscured by walls or other inaccessible obstacles.
    - Agent: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
 
@@ -41,7 +40,7 @@ You can choose from the following actions to interact with the environment:
 	- Drop(): Drop the currently held object in front of you.
     - Toggle(): Manipulate the object (e.g. open the door) 
 ## Movement Rules:
-    - You can only move to cells marked as Empty.
+    - You can only move to cells marked as Empty. But you can share a space with your teammate.
     - Movement into walls, lava, or unseen areas is not allowed.
     - Plan your actions strategically to avoid backtracking and maximize exploration efficiency.
 

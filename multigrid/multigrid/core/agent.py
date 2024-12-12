@@ -54,6 +54,7 @@ class Agent:
     def __init__(
         self,
         index: int,
+        color: str,
         mission_space: MissionSpace = MissionSpace.from_string('maximize reward'),
         view_size: int = 3,
         restricted_obj: List[Union[Type, str]] =[],
@@ -96,6 +97,7 @@ class Agent:
         self.load_restricted_obj(restricted_obj)
         # Actions are discrete integer values
         self.action_space = spaces.Discrete(len(Action))
+        self.state.color = color
 
     # AgentState Properties
     color = PropertyAlias(
