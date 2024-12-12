@@ -65,8 +65,6 @@ class LLMAgent(Agent):
 system_prompt_folder = "maulik_prompt"
 system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/system_prompt_multi.txt")
 
-print(system_prompt)
-
 client = OpenAI()
 messages = [{"role": "system", "content": system_prompt}]
 
@@ -96,55 +94,55 @@ obs[1] = "Let's think step by step. Both agents are on a grid now; please begin 
 # for agent in agents:
 #    obs[agent.index] = "Observation: You are begining to solve the task now. Please explore the environment and try to pick up the goal."
 
-t = 0
-
 observations, infos = env.reset()
 done = False
 while not done:
 
-    if t == 0:
-        actions = {0: ACTION_SPACE["forward()"], 1: ACTION_SPACE["forward()"]}
-        t += 1
+    # if t == 0:
+    #     actions = {0: ACTION_SPACE["forward()"], 1: ACTION_SPACE["forward()"]}
+    #     t += 1
 
+    # else:
+
+    print("Agent-1: \n "+obs[0]+" \n Agent-2: \n "+obs[1])
+
+    messages.append({"role": "user", "content": "Agent-1: \n"+obs[0]+"\n Agent-2: \n"+obs[1]})
+
+    # print(f"Observation: {obs}")
+    # print(messages)
+    response = client.chat.completions.create(
+        model='gpt-4o',
+        messages=messages,
+        max_tokens=1000,
+        temperature=0.0,
+        top_p=0.9
+    ).choices[0].message.content
+    messages.append({"role": "assistant", "content": response})
+    print(f"Assistant: {response}")
+    pattern1 = r"Action-1:\s*([A-Za-z]+\(.*?\))"
+    match1 = re.search(pattern1, response)
+    pattern2 = r"Action-2:\s*([A-Za-z]+\(.*?\))"
+    match2 = re.search(pattern2, response)
+    actions = {}
+    if match1:
+        action = match1.group(1)
+        actions[0] = ACTION_SPACE[action.lower().strip()]
     else:
-
-        print("Agent-1: "+obs[0]+"Agent-2: "+obs[1])
-
-        messages.append({"role": "user", "content": "Agent-1: "+obs[0]+"Agent-2: "+obs[1]})
-
-        # print(f"Observation: {obs}")
-        # print(messages)
-        response = client.chat.completions.create(
-            model='gpt-4o',
-            messages=messages,
-            max_tokens=1000,
-            temperature=0.0,
-            top_p=0.9
-        ).choices[0].message.content
-        messages.append({"role": "assistant", "content": response})
-        print(f"Assistant: {response}")
-        pattern1 = r"Action-1:\s*([A-Za-z]+\(.*?\))"
-        match1 = re.search(pattern1, response)
-        pattern2 = r"Action-2:\s*([A-Za-z]+\(.*?\))"
-        match2 = re.search(pattern2, response)
-        actions = {}
-        if match1:
-            action = match1.group(1)
-            actions[0] = ACTION_SPACE[action.lower().strip()]
-        else:
-            obs[0] = "Failed to parse your action."
-            continue
-        if match2:
-            action = match2.group(1)
-            actions[1] = ACTION_SPACE[action.lower().strip()]
-        else:
-            obs = "Failed to parse your action."
-            continue
+        obs[0] = "Failed to parse your action."
+        continue
+    if match2:
+        action = match2.group(1)
+        actions[1] = ACTION_SPACE[action.lower().strip()]
+    else:
+        obs = "Failed to parse your action."
+        continue
 
     observations, rewards, terminations, truncations, infos = env.step(actions)
     for agent_index, observation in observations.items():
         obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
 
     done = any([rewards[idx] for idx in rewards.keys()])
+
+    messages.pop()
    
 env.close()
