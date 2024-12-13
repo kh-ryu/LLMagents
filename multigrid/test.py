@@ -32,7 +32,6 @@ ACTION_SPACE = {
     "done()": Action.done
 }
 
-
 class LLMAgent(Agent):
    def __init__(self, system_prompt, *args, **kwargs):
       super().__init__(*args, **kwargs)
@@ -75,7 +74,7 @@ class LLMAgent(Agent):
       self.messages.append({"role": "assistant", "content": response})
       return action
 
-      
+
 mission = MissionSpace.from_string("Pick up the goal")
 agents = [LLMAgent(system_prompt=system_prompt, index=0, mission_space=mission, view_size=3), 
           LLMAgent(system_prompt=system_prompt,index=1, mission_space=mission, view_size=3)]
