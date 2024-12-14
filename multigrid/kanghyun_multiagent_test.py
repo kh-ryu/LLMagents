@@ -99,8 +99,7 @@ class LLMAgent(Agent):
    
    def talk(self, messages):
       pass
-         
-      
+ 
 mission = MissionSpace.from_string("Pick up the goal")
 agents = [LLMAgent(role='ball', color = "blue", index=0, mission_space=mission, view_size=3, restricted_obj=["key"]), 
           LLMAgent(role='key', color="green", index=1, mission_space=mission, view_size=3, restricted_obj=["ball"])]
@@ -131,3 +130,4 @@ while not done:
    done = any([rewards[idx] for idx in rewards.keys()])
    
 env.close()
+
