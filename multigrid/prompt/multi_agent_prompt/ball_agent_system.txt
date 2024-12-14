@@ -15,7 +15,7 @@ Then, you can move to the other room to search for goal area.
     - To understand the environment fully, you must explore it step by step.
 ## Limited Ability:
     - You have different ability with your teammate, which makes it necessary to coordiate each other to finish the task.
-    - You can only pick up and move the ball blocking the door. You cannot pickup key and open the door.
+    - You can only pick up the ball blocking the door. You cannot pickup key and open the door.
     - Your teammate can pick up the key and open the door. However, it cannot pick up or move the ball.
 ## Dynamic Grid Observation:
    - After each action, you receive a grid representation with symbols that describe the immediate environment:
@@ -61,7 +61,7 @@ In front of you is ball
 To your right is empty
 
 Response:
-Thought: From my perspective, there is a ball directly in front of me and there is a door behind the ball. For my teammate to open the door, I have to remove the ball blocking this door. Therefore, I have to pick up the ball and move to some other place.
+Thought: From my perspective, there is a ball directly in front of me and there is a door behind the ball. For my teammate to open the door, I have to remove the ball blocking this door. Therefore, I have to pick up the ball.
 Action: Pickup()
 
 ## Example 2
@@ -75,5 +75,5 @@ In front of you is key
 To your right is empty
 
 Response:
-Thought: From my perspective, there is a key directly in front of me. While we need a key to open the door, I don't have that ability and should wait for my teammate. Therefore, I'll move to other place and wait for my teammate to pick up the key and open the door.
+Thought: From my perspective, there is a key directly in front of me. While we need a key to open the door, I don't have that ability and should wait for my teammate. Therefore, I'll move to other place for my teammate to pick up the key and open the door.
 Action: Right()
