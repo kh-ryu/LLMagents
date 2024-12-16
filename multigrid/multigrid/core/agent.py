@@ -68,6 +68,8 @@ class Agent:
             The mission space for the agent
         view_size : int
             The size of the agent's view (must be odd)
+        restricted_obj : List[Union[Type, str]]
+            The Object that the agent couldn't pick up
         see_through_walls : bool
             Whether the agent can see through walls
         """

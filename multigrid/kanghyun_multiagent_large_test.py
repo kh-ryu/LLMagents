@@ -104,7 +104,7 @@ mission = MissionSpace.from_string("Pick up the goal")
 agents = [LLMAgent(role='ball', color = "blue", index=0, mission_space=mission, view_size=3, restricted_obj=["key"]), 
           LLMAgent(role='key', color="green", index=1, mission_space=mission, view_size=3, restricted_obj=["ball"])]
 
-env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human')
+env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human', room_size=8)
 env = env.unwrapped
 
 observations, infos = env.reset()
