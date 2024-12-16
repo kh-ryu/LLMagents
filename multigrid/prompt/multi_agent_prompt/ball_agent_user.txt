@@ -5,4 +5,5 @@ Remember, you can only move to front cells marked as Empty.
 Movement into walls, lava, or unseen areas is not allowed.
 Remember, you can only manipulate objects that are directly in front of you.
 Moving forward rather than turning around helps with effective exploration. Try to go forward when you see your goal object.
+If you see a goal, focus on getting to the ball. Do not worry about other tasks.
 Let’s think step by step. 
