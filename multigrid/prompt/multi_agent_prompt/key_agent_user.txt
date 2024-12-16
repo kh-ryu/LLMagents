@@ -3,9 +3,9 @@ Your current goal is to pick up the key and open the door with that key.
 First, find the key and pick up the key when the key is in front of you.
 Then, open the door by toggle action when you are facing the door in front of you.
 Do not pick up the ball again as you cannot picup the ball.
-If you accidently picked up the ball, drop it immediatly.
 Remember that you should carry the key when you open the door.
 Remember, you can only move to the cell in front of you marked as Empty.
 Movement into walls, lava, or unseen areas is not allowed.
 Remember, you can only manipulate objects that are directly in front of you.
+Moving forward rather than turning around helps with effective exploration. Try to go forward when you see your goal object.
 Let’s think step by step. 

@@ -1,7 +1,8 @@
 You are on a grid now; please begin exploring the environment to gather some information about it.
 Your current goal is to pick up the ball blocking the door.
-After you pick up the ball, drop it to any place that is not an original place that blocks the door.
+After you pick up the ball, do not drop the ball as it might block the teammates way.
 Remember, you can only move to front cells marked as Empty.
 Movement into walls, lava, or unseen areas is not allowed.
 Remember, you can only manipulate objects that are directly in front of you.
+Moving forward rather than turning around helps with effective exploration. Try to go forward when you see your goal object.
 Let’s think step by step. 

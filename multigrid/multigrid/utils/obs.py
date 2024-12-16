@@ -350,7 +350,7 @@ def obs_to_text(
         "box": "box", 
         "goal": "goal",
         "lava": "lava", 
-        "agent": "agent", 
+        "agent": "teammate", 
     }
 
     for agent in range(num_agents):
@@ -381,11 +381,11 @@ def obs_to_text(
                 except:
                     cell_state = ""
                 if [i, j] == [obs_width // 2, obs_height - 2]:
-                    direct_observation += f"In front of you is {cell_type}\n"
+                    direct_observation += f"In front of you is {type_symbols[cell_type]}\n"
                 elif [i, j] == [obs_width // 2 - 1, obs_height -1]:
-                    direct_observation += f"To your left is {cell_type}\n"
+                    direct_observation += f"To your left is {type_symbols[cell_type]}\n"
                 elif [i, j] == [obs_width // 2 + 1, obs_height - 1]:
-                    direct_observation += f"To your right is {cell_type}\n"
+                    direct_observation += f"To your right is {type_symbols[cell_type]}\n"
 
                 # Generate cell content
                 if [i, j] == [obs_width // 2, obs_height - 1]:  # Agent's position

@@ -29,7 +29,7 @@ Then, you can move to the other room to search for goal area.
    - A Box: you can pick up, carry on, and drop in front of you.
    - A Goal: indicating a agent destination.
    - An Unseen area: Outside your current visibility, potentially beyond the map’s boundaries or obscured by walls or other inaccessible obstacles.
-   - Agent: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
+   - A Teammate: Another agent present in the environment. They are your teammates, and you work together to complete the assigned tasks.
 
 # Action Space #
 You can choose from the following actions to interact with the environment:
