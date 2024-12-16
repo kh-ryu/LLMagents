@@ -11,7 +11,7 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 system_prompt_folder = "kanghyun_prompt"
 user_prompt_folder = "kanghyun_prompt"
 
-system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/system_prompt.txt")
+system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/single_system_prompt.txt")
 
 
 client = OpenAI()
