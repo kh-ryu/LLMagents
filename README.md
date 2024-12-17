@@ -8,9 +8,10 @@ Course project for CS294 LLM agents
 
 ## Installation
 
-Create Conda Environment
+Create Conda Environment and activate it
 ```bash
 conda create -n cs294_llmagents python=3.9
+conda activate cs294_llmagents
 ```
 Install dependencies
 ```bash
