@@ -113,6 +113,7 @@ for agent_index, observation in observations.items():
    text_obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
 
 done = False
+steps = 0
 while not done:
    actions = {}
 
@@ -128,6 +129,11 @@ while not done:
       text_obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
       
    done = any([rewards[idx] for idx in rewards.keys()])
+   steps += 1
+   print(f"Step: {steps}")
+   if steps > 150:
+      print("Failed to complete the task.")
+      break
    
 env.close()
 

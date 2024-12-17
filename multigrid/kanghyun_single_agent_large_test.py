@@ -16,7 +16,7 @@ system_prompt = file_to_string(f"./prompt/{system_prompt_folder}/single_system_p
 
 client = OpenAI()
 messages = [{"role": "system", "content": system_prompt}]
-env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=1, render_mode='human', room_size=8)
+env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=1, render_mode='human', room_size=10, agent_view_size=5)
 env = env.unwrapped
 
 ACTION_SPACE = {
@@ -39,8 +39,7 @@ is_door_open = False
 history = [{"role": "user", "content": text_obs}]
 history_max_len = 10
 
-step = 0
-
+steps = 0
 while not done:
    if is_ball_moved is False and is_door_open is False:
       user = file_to_string(f"./prompt/{user_prompt_folder}/user_prompt_ball.txt")
@@ -63,8 +62,6 @@ while not done:
       continue
    
    observations, rewards, terminations, truncations, infos = env.step(action)
-   step += 1
-   print(f"Step: {step}")
    text_obs = observations[0]["text"][0] if isinstance(observations[0]["text"], list) else observations[0]["text"]
    history.append({"role": "user", "content": text_obs})
    if len(history) > history_max_len:
@@ -74,6 +71,10 @@ while not done:
    is_door_open = env.door_open()
 
    done = any(terminations.values())
+   steps += 1
+   print(f"Step: {steps}")
+   if steps > 300:
+      print("Failed to complete the task.")
+      break
    
 env.close()
-print("Total Steps: ", step)

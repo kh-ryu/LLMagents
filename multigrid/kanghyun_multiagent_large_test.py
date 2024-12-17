@@ -99,12 +99,12 @@ class LLMAgent(Agent):
    
    def talk(self, messages):
       pass
- 
-mission = MissionSpace.from_string("Pick up the goal")
-agents = [LLMAgent(role='ball', color = "blue", index=0, mission_space=mission, view_size=3, restricted_obj=["key"]), 
-          LLMAgent(role='key', color="green", index=1, mission_space=mission, view_size=3, restricted_obj=["ball"])]
 
-env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human', room_size=8)
+mission = MissionSpace.from_string("Pick up the goal")
+agents = [LLMAgent(role='ball', color = "blue", index=0, mission_space=mission, view_size=5, restricted_obj=["key"]), 
+          LLMAgent(role='key', color="green", index=1, mission_space=mission, view_size=5, restricted_obj=["ball"])]
+
+env = gym.make('MultiGrid-BlockedUnlockPickup-v0', agents=agents, render_mode='human', room_size=10)
 env = env.unwrapped
 
 observations, infos = env.reset()
@@ -113,6 +113,7 @@ for agent_index, observation in observations.items():
    text_obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
 
 done = False
+steps = 0
 while not done:
    actions = {}
 
@@ -128,6 +129,11 @@ while not done:
       text_obs[agent_index] = observation["text"][0] if isinstance(observation["text"], list) else observation["text"]
       
    done = any([rewards[idx] for idx in rewards.keys()])
+   steps += 1
+   print(f"Step: {steps}")
+   if steps > 300:
+      print("Failed to complete the task.")
+      break
    
 env.close()
 
