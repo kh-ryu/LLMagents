@@ -15,7 +15,7 @@ def gpt_interaction(client, gpt_model, messages):
             model=gpt_model,
             messages=messages,
             max_tokens=1000,
-            temperature=0.5,
+            temperature=0.5
         )
         trial += 1
 

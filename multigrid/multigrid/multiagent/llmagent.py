@@ -16,14 +16,15 @@ CHAT_SYSTEM_PROMPT = f"""
 You will communicate and share information with other agents. Through conversation, you will gather relevant details from them and collaboratively decide on the next course of action. Use the Chat Action to send and receive messages.
 Action Space:
 {Chat.action_description()}
+You Could ONLY Use the Chat Action in your response.
 """
 
 
 class LLMAgent(Agent):
-    def __init__(self, sys_prompt_path, availiable_action: List[Union[AgentAction, str]], window_size:int=10, *args, **kwargs):    
+    def __init__(self, sys_prompt_path, mission_str, availiable_action: List[Union[AgentAction, str]], window_size:int=10, *args, **kwargs):    
         super().__init__(*args, **kwargs)
-        
-        self.llm = OpenAI()
+        self.mission_str = mission_str
+        self.llm = OpenAI(base_url="https://api.aigcbest.top/v1")
         self.availiable_action = availiable_action
         self.system_prompt = file_to_string(sys_prompt_path)
         self.chat_history = []
@@ -34,6 +35,7 @@ class LLMAgent(Agent):
         action = None
         availiable_action_description = "\n".join(action.action_description() for action in self.availiable_action)
         system_prompt  = self.system_prompt.replace("===action===", availiable_action_description)
+        system_prompt = system_prompt.replace("===mission===", self.mission_str)
         turn = 1
         chat_msg = ""
         for msg in self.chat_history:
@@ -48,11 +50,14 @@ class LLMAgent(Agent):
             # Increment the turn count after each user-agent interaction
             if msg['role'] == "assistant":
                 turn += 1
-        obs = f"Chat History:\n{chat_msg}\n\n" + obs if self.chat_history else obs
+        
+        chat_obs = f"Chat History:\n{chat_msg}\n\n" + obs if self.chat_history else obs
         # Select appropriate history
-        active_history = [{"role": "system", "content": system_prompt}]+ self.history
+        active_history = [{"role": "system", "content": system_prompt}]+ copy.deepcopy(self.history)
+
         # Update selected history with user input
-        active_history.append({"role": "user", "content": obs})
+        active_history.append({"role": "user", "content": chat_obs})
+        self.history.append({"role": "user", "content": obs})
         print(f"Agent {self.index} Color: {self.color}")
         print(f"Agent {self.index} Observation: {obs}")
         
@@ -65,13 +70,20 @@ class LLMAgent(Agent):
                 action = self.parse_action(response)
                 if action:
                     break
+                else:
+                    msg = "Failed to parse your Action. You must choose One Action from your action space. Please try again."
+                    active_history.append({"role": "assistant", "content": response})
+                    active_history.append({"role": "user", "content": msg})
+                    continue
             except Exception as e:
-                print(f"Error parsing action: {e}")
+                msg = "Failed to parse your Action. You must choose One Action from your action space, and None Action is not allowed. Please try again."
+                active_history.append({"role": "assistant", "content": response})
+                active_history.append({"role": "user", "content": msg})
                 continue
-            
+                
         # Update the selected history with the assistant's response
-        active_history.append({"role": "assistant", "content": response})
-        active_history[:] = active_history[-self.window_size:]
+        self.history.append({"role": "assistant", "content": response})
+        self.history[:] = self.history[-self.window_size:]
         self.chat_history = []
         return action
     
@@ -116,7 +128,7 @@ class LLMAgent(Agent):
 
         combined_history = (
             "### Summary of Your Progress ###\n\n"
-            f"Your system Goal:\n{self.system_prompt}\n\n"
+            f"Your Mission: {self.mission_str}\n\n"
             f"Your Exploration History:\n" +
             "\n".join(
                 f"{message['role']}: {message['content']}" if message["role"] != "assistant" 

@@ -22,7 +22,11 @@ class MultiAgent:
     def solve(self, obs: Dict[int, str], max_steps: int=30):
         self.env.reset()
         done = False
+        step = 0
         for i in range(max_steps):
+            import time
+            time.sleep(1)
+            print(f"Step: {step}")
             actions = {}
             current_result = {}
             for agent in self.agents:
@@ -42,10 +46,11 @@ class MultiAgent:
             if done:
                 break
             self.chat(current_result)
+            step += 1
             
-        return done
+        return done, step
 
-    def chat(self, current_result, max_turns: int=3):
+    def chat(self, current_result, max_turns: int=2):
         obs = ["You are going to chat now. Please communicate with the other agent to share information and complete the task more effectively.\n"]
         print("Starting Chat Session...")
         for turn in range(max_turns):
