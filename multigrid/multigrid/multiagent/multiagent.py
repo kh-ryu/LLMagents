@@ -45,12 +45,16 @@ class MultiAgent:
             done = any([rewards[idx] for idx in rewards.keys()])
             if done:
                 break
-            self.chat(current_result)
+            
+            
+            if (step + 1) % 5 == 0:
+                self.chat(current_result)
+            
             step += 1
             
         return done, step
 
-    def chat(self, current_result, max_turns: int=2):
+    def chat(self, current_result, max_turns: int=3):
         obs = ["You are going to chat now. Please communicate with the other agent to share information and complete the task more effectively.\n"]
         print("Starting Chat Session...")
         for turn in range(max_turns):

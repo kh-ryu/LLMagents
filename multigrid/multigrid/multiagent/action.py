@@ -164,7 +164,7 @@ class Drop(AgentAction):
     @classmethod
     def parse_action_from_text(cls, text):
         text = text.lower()
-        match = re.match(r"toggle\((.*?)\)", text.strip(), re.DOTALL)
+        match = re.match(r"drop\((.*?)\)", text.strip(), re.DOTALL)
         if match:
            action = match.group(1).strip()
            return cls(params={"name": "drop()"})

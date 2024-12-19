@@ -19,27 +19,51 @@ Action Space:
 You Could ONLY Use the Chat Action in your response.
 """
 
+SUMMARIZE_PROMPT = """
+After Chating with your teammate, please based on your responsibilities, historical exploration, and previous interactions with teammates, update your plans, beliefs, and understanding of the environment.
+Your response should include:
+
+Thought: A brief description of your thought process.
+Update Information: The Update Information should be presented as a JSON object containing two key components:
+	1. Belief: Describe your current understanding and perception of the environment after chat with your teammate. This should reflect how you interpret available data, past experiences, and team interactions.
+	2. Plan: Outline your intended course of action. This should include specific strategies or steps you plan to take to achieve your goals while considering potential challenges and adjustments.
+
+Response Format:
+Thought: ...
+Update Information: 
+{
+    "Belief": "Your current understanding and perception of the environment based on gathered information, past experiences, and team interactions.",
+    "Plan": "Your proposed course of action and strategy to effectively accomplish the assigned tasks, considering current goals and potential challenges."
+}
+
+
+"""
 
 class LLMAgent(Agent):
     def __init__(self, sys_prompt_path, mission_str, availiable_action: List[Union[AgentAction, str]], window_size:int=10, *args, **kwargs):    
         super().__init__(*args, **kwargs)
         self.mission_str = mission_str
-        self.llm = OpenAI(base_url="https://api.aigcbest.top/v1")
+        self.llm = OpenAI()
         self.availiable_action = availiable_action
         self.system_prompt = file_to_string(sys_prompt_path)
         self.chat_history = []
         self.history = []
+        self.plan = ""
+        self.belief = ""
         self.window_size = window_size
     
     def response(self, obs: str):
+        # if self.chat_history:
+        #   self.summarize_chat()
         action = None
         availiable_action_description = "\n".join(action.action_description() for action in self.availiable_action)
         system_prompt  = self.system_prompt.replace("===action===", availiable_action_description)
         system_prompt = system_prompt.replace("===mission===", self.mission_str)
-        turn = 1
-        chat_msg = ""
+        # system_prompt = system_prompt.replace("===belief===", self.belief)
+        # system_prompt = system_prompt.replace("===plan===", self.plan)
+        turn = 0
+        chat_msg = "Chat History:\n" if self.chat_history else ""
         for msg in self.chat_history:
-            # Add turn number before each message
             if msg['role'] == "user":
                 chat_msg += f"Turn {turn}:\n"
                 chat_msg += f"{msg['role']}: {msg['content']}\n"
@@ -47,21 +71,16 @@ class LLMAgent(Agent):
                 parsed_msg = self.parse_action(msg['content'], availiable_actions=[Chat])
                 chat_msg += f"You: {msg['content']}\n" if not isinstance(parsed_msg, Chat) else f"You: {parsed_msg.params.get('message', '')}"
                 
-            # Increment the turn count after each user-agent interaction
             if msg['role'] == "assistant":
                 turn += 1
-        
-        chat_obs = f"Chat History:\n{chat_msg}\n\n" + obs if self.chat_history else obs
-        # Select appropriate history
+        self.chat_history = []    
+        chat_obs = chat_msg + "\n" + obs
+        self.history.append({"role": "user", "content": chat_obs})
         active_history = [{"role": "system", "content": system_prompt}]+ copy.deepcopy(self.history)
-
-        # Update selected history with user input
-        active_history.append({"role": "user", "content": chat_obs})
-        self.history.append({"role": "user", "content": obs})
+       
         print(f"Agent {self.index} Color: {self.color}")
-        print(f"Agent {self.index} Observation: {obs}")
-        
-        # Try action parsing up to 3 times
+        print(f"Agent {self.index} Observation: {chat_obs}")
+    
         for i in range(3):
             response = gpt_interaction(self.llm, "gpt-4o",  active_history)
             print(f"Agent {self.index} Response: {response}")
@@ -81,10 +100,10 @@ class LLMAgent(Agent):
                 active_history.append({"role": "user", "content": msg})
                 continue
                 
-        # Update the selected history with the assistant's response
+       
         self.history.append({"role": "assistant", "content": response})
         self.history[:] = self.history[-self.window_size:]
-        self.chat_history = []
+        
         return action
     
 
@@ -166,7 +185,68 @@ class LLMAgent(Agent):
         return action
 
         
+    def summarize_chat(self): 
+        turn = 1
+        chat_msg = ""
+        for msg in self.chat_history:
+            if msg['role'] == "user":
+                chat_msg += f"Turn {turn}:\n"
+                chat_msg += f"{msg['role']}: {msg['content']}\n"
+            else:
+                parsed_msg = self.parse_action(msg['content'], availiable_actions=[Chat])
+                chat_msg += f"You: {msg['content']}\n" if not isinstance(parsed_msg, Chat) else f"You: {parsed_msg.params.get('message', '')}"
+                
+            if msg['role'] == "assistant":
+                turn += 1
+        
+        prompt = (
+            "Your Mission and Goal: {self.mission}"
+            f"Your Exploration History:\n" +
+            "\n".join(
+                f"{message['role']}: {message['content']}" if message["role"] != "assistant" 
+                else f"You: {message['content']}" 
+                for message in self.history
+            ) +
+            f"Your Chat History with teammate:\n {chat_msg}"
+            f"Your Current Belief: {self.belief}"
+            f"Your Current Plan: {self.plan}"
+        )
 
+        
+        messages = [{"role": "system", "content": SUMMARIZE_PROMPT}, {"role": "user", "content": prompt}]
+        
+        for attempt in range(3):
+            print(f"Agent {self.index} Summarize (Attempt {attempt + 1}):")
+            response = gpt_interaction(self.llm, "gpt-4o", messages)
+            print(f"Agent {self.index} Response: {response}")
+            
+            pattern = r"\{.*?\}"
+            matches = re.findall(pattern, response, re.DOTALL)
+ 
+            for match in matches:
+                dict_str = match.replace("\n", "").replace("\t", "")
+               
+                try:
+                    result = json.loads(dict_str)
+                    belief = result.get("Belief", "")
+                    plan = result.get("Plan", "")
+                    
+                    
+                    self.belief = belief if belief else ""
+                    self.plan = plan if plan else ""
+                    
+                    self.chat_history = []  
+                    return 
+                
+                except json.JSONDecodeError:
+                    continue
+        
+        self.chat_history = []
+        return None
+            
+            
+
+        
         
         
        
